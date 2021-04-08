@@ -10,9 +10,16 @@ import {
   orderCancelling,
   orderCancelled,
   orderFilling,
+  orderFilled,
+  etherBalanceLoaded,
+  tokenBalanceLoaded,
+  exchangeEtherBalanceLoaded,
+  exchangeTokenBalanceLoaded,
+  balancesLoaded,
 } from "./actions";
 import Token from "../abis/Token.json";
 import Exchange from "../abis/Exchange.json";
+import { ETHER_ADDRESS } from "../helpers";
 
 export const loadWeb3 = async (dispatch) => {
   if (typeof window.ethereum !== "undefined") {
@@ -140,5 +147,30 @@ export const loadBalances = async (
   token,
   account
 ) => {
-  // TODO: Fill me in...
+  if (typeof account !== "undefined") {
+    // Ether balance in wallet
+    const etherBalance = await web3.eth.getBalance(account);
+    dispatch(etherBalanceLoaded(etherBalance));
+
+    // Token balance in wallet
+    const tokenBalance = await token.methods.balanceOf(account).call();
+    dispatch(tokenBalanceLoaded(tokenBalance));
+
+    // Ether balance in exchange
+    const exchangeEtherBalance = await exchange.methods
+      .balanceOf(ETHER_ADDRESS, account)
+      .call();
+    dispatch(exchangeEtherBalanceLoaded(exchangeEtherBalance));
+
+    // Token balance in exchange
+    const exchangeTokenBalance = await exchange.methods
+      .balanceOf(token.options.address, account)
+      .call();
+    dispatch(exchangeTokenBalanceLoaded(exchangeTokenBalance));
+
+    // Trigger all balances loaded
+    dispatch(balancesLoaded());
+  } else {
+    window.alert("Please login with MetaMask");
+  }
 };
