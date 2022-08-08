@@ -1,4 +1,4 @@
-// const hre = require("hardhat");
+const { ethers } = require("hardhat");
 
 async function main() {
   // 1. Fetch contract to deploy
