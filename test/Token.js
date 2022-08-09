@@ -2,14 +2,19 @@ const { expect } = require('chai');
 const { ethers } = require("hardhat");
 
 describe("Token", function() {
-  // Tests go inside here...
-  it("has a name", async function() {
-    // Fetch Token from blockchain
+  let token;
+
+  beforeEach(async function() {
     const Token = await ethers.getContractFactory("Token")
-    let token = await Token.deploy()
-    // Read token name
-    const name = await token.name()
-    // check that name is correct
-    expect(name).to.equal("My Token")
+    token = await Token.deploy()
   });
+
+  it("has correct name", async function() {
+    expect(await token.name()).to.equal("DAPP Token")
+  });
+
+  it("has correct symbol", async function() {
+    expect(await token.symbol()).to.equal("DAPP")
+  });
+
 });
